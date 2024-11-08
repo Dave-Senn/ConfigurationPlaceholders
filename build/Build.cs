@@ -296,8 +296,8 @@ public sealed class Build : NukeBuild
         .Executes( () =>
         {
             var tagName = $"{Version}-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-release".Replace( '/', '_' ).Replace( '\\', '_' );
-            Git( $"tag {tagName}", logOutput: false );
-            Git( "push --tags", logOutput: false );
+            Git( $"tag {tagName}", logOutput: true );
+            Git( "push --tags", logOutput: true );
         } );
 
     Target Default => _ => _

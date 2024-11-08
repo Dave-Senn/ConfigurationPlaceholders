@@ -9,7 +9,7 @@ on:
 
 jobs:
   setup-job:
-    runs-on: windows-latest
+    runs-on: self-hosted
     name: Building ConfigurationPlaceholders
     steps:
       - uses: actions/checkout@v3
