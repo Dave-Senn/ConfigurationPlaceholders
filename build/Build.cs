@@ -265,6 +265,8 @@ public sealed class Build : NukeBuild
         .OnlyWhenDynamic( () => ( IsServerBuild || BuildServerOverride ) && !GitHubActions.Instance.IsPullRequest )
         .Executes( () =>
         {
+            Log.Information( "Publishing packages; Is pull request: {IsPullRequest}", GitHubActions.Instance.IsPullRequest );
+
             GlobFiles( (String) ResultNuGetDirectory, "*.nupkg" )
                 .ForEach( x =>
                 {
