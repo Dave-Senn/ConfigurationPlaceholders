@@ -2,7 +2,7 @@ name: GitHub Actions Build
 run-name: Building ConfigurationPlaceholders
 
 on:
-  [push, pull_request]:
+  [push, pull_request]
     branches: [ '**' ]
 
 jobs:
