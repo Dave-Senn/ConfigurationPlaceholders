@@ -13,7 +13,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Dave Senn</Authors>
-    <Copyright>Copyright (c) Dave Senn 2022</Copyright>
+    <Copyright>Copyright (c) Dave Senn</Copyright>
     <Description>Adds support for placeholders to the .NET configuration stack.</Description>
     <PackageTags>Configuration;Placeholder;Options</PackageTags>
     <Product>ConfigurationPlaceholders</Product>
@@ -23,10 +23,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <DebugSymbols>true</DebugSymbols>
     <PackageId>ConfigurationPlaceholders</PackageId>
-    <PackageProjectUrl>https://github.com/DaveSenn/ConfigurationPlaceholders</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</PackageProjectUrl>
     <RespositoryType>git</RespositoryType>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <RepositoryUrl>https://github.com/DaveSenn/ConfigurationPlaceholders</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</RepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EmbedAllSources>true</EmbedAllSources>
     <DebugType>portable</DebugType>
