@@ -7,9 +7,7 @@ using Nuke.Common.Utilities;
 public sealed class Build : NukeBuild
 #pragma warning restore CA1050 // Declare types in namespaces
 {
-    // ReSharper disable once InconsistentNaming
     [Solution( GenerateProjects = true )] readonly Solution Solution = default!;
-
     AbsolutePath ResultDirectory => RootDirectory / "result";
     AbsolutePath ResultNuGetDirectory => ResultDirectory / "nuget";
     AbsolutePath ReSharperSettingsFile => RootDirectory / "data/r#Settings.DotSettings";
@@ -29,6 +27,9 @@ public sealed class Build : NukeBuild
 
     [Secret]
     String? NuGetApiKey => Environment.GetEnvironmentVariable( "NUGET_API_KEY" );
+
+    [Secret]
+    String? GitHubAccessToken => Environment.GetEnvironmentVariable( "ACCESS_TOKEN_GITHUB" );
 
     Int32 RequiredCoveragePercentage => 95;
 
@@ -184,13 +185,13 @@ public sealed class Build : NukeBuild
                     uncoveredTypes.Add( typeName );
                 }
 
-                throw new($"The build contains uncovered types '{String.Join( ",", uncoveredTypes )}'");
+                throw new( $"The build contains uncovered types '{String.Join( ",", uncoveredTypes )}'" );
             }
 
             Log.Information( "Code coverage is {0}%", totalCoverage );
             // Check coverage is not too low
             if ( totalCoverage < RequiredCoveragePercentage )
-                throw new($"Unit test coverage is too low (must be at least {RequiredCoveragePercentage}% but is only {totalCoverage}%).");
+                throw new( $"Unit test coverage is too low (must be at least {RequiredCoveragePercentage}% but is only {totalCoverage}%)." );
         } );
 
     Target ScanForVulnerabilities => _ => _
@@ -209,7 +210,7 @@ public sealed class Build : NukeBuild
             {
                 foreach ( var x in process.Output )
                     Log.Error( x.Text );
-                throw new("Found vulnerable packages.");
+                throw new( "Found vulnerable packages." );
             }
         } );
 
@@ -264,16 +265,12 @@ public sealed class Build : NukeBuild
         .OnlyWhenDynamic( () => ( IsServerBuild || BuildServerOverride ) && !GitHubActions.Instance.IsPullRequest )
         .Executes( () =>
         {
+            Log.Information( "Publishing packages; Is pull request: {IsPullRequest}", GitHubActions.Instance.IsPullRequest );
+
             GlobFiles( (String) ResultNuGetDirectory, "*.nupkg" )
                 .ForEach( x =>
                 {
                     Log.Information( "Start publishing package '{0}'", x );
-
-                    // Push to GitHub setup from within the GH action script
-                    DotNetNuGetPush( c => c
-                                         .SetTargetPath( x )
-                                         .SetSource( "github" )
-                                         .EnableSkipDuplicate() );
 
                     // Push to NuGet.org
                     DotNetNuGetPush( c => c
@@ -281,6 +278,15 @@ public sealed class Build : NukeBuild
                                          .SetApiKey( NuGetApiKey )
                                          .SetSource( "https://api.nuget.org/v3/index.json" )
                                          .EnableSkipDuplicate() );
+                    Log.Information( "Successfully published package '{0}' to nuget.org", x );
+
+                    // Push to GitHub setup from within the GH action script
+                    DotNetNuGetPush( c => c
+                                         .SetTargetPath( x )
+                                         .SetApiKey( GitHubAccessToken )
+                                         .SetSource( "github" )
+                                         .EnableSkipDuplicate() );
+                    Log.Information( "Successfully published package '{0}' to github", x );
                 } );
         } );
 
@@ -290,8 +296,8 @@ public sealed class Build : NukeBuild
         .Executes( () =>
         {
             var tagName = $"{Version}-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}-release".Replace( '/', '_' ).Replace( '\\', '_' );
-            Git( $"tag {tagName}", logOutput: false );
-            Git( "push --tags", logOutput: false );
+            Git( $"tag {tagName}", logOutput: true );
+            Git( "push --tags", logOutput: true );
         } );
 
     Target Default => _ => _
@@ -303,5 +309,6 @@ public sealed class Build : NukeBuild
 
     public static Int32 Main() =>
         Execute<Build>( x => x.Default );
+    // ReSharper disable once InconsistentNaming
 }
 #pragma warning restore CA1822 // Mark members as static

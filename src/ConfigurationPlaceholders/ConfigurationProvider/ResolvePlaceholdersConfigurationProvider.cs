@@ -83,20 +83,13 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
             }
 
             if ( !placeholderValueProvided )
-                switch ( _missingPlaceholderValueStrategy )
+                placeholderValue = _missingPlaceholderValueStrategy switch
                 {
-                    case MissingPlaceholderValueStrategy.VerifyAllAtStartup:
-                    case MissingPlaceholderValueStrategy.Throw:
-                        throw new ConfigurationPlaceholderMissingException( $"Could not resolve a value for placeholder '{placeholderKey}'." );
-
-                    case MissingPlaceholderValueStrategy.UseEmptyValue:
-                        placeholderValue = String.Empty;
-                        break;
-
-                    case MissingPlaceholderValueStrategy.IgnorePlaceholder:
-                        placeholderValue = $"${{{placeholderKey}}}";
-                        break;
-                }
+                    MissingPlaceholderValueStrategy.VerifyAllAtStartup or MissingPlaceholderValueStrategy.Throw => throw new ConfigurationPlaceholderMissingException( $"Could not resolve a value for placeholder '{placeholderKey}'." ),
+                    MissingPlaceholderValueStrategy.UseEmptyValue => String.Empty,
+                    MissingPlaceholderValueStrategy.IgnorePlaceholder => $"${{{placeholderKey}}}",
+                    _ => placeholderValue
+                };
             else
                 placeholderValue = ReplacePlaceholderInValue( placeholderValue );
 
