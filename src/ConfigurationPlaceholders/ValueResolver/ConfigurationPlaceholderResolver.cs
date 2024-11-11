@@ -19,7 +19,7 @@ public sealed class ConfigurationPlaceholderResolver : IPlaceholderResolver
     /// <returns>True if a matching value was found; otherwise, false.</returns>
     public Boolean GetValue( IConfiguration configuration, String key, out String? value )
     {
-        value = configuration[key];
+        value = configuration[ key ];
         return value is not null;
     }
 

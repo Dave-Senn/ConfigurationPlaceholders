@@ -18,15 +18,16 @@ public sealed class CallbackPlaceholderResolverTest
                 "b", () => "ValueB"
             }
         };
+
         var target = new CallbackPlaceholderResolver( values );
 
         var actual = target.GetValue( configuration.Object, "a", out var value );
         Assert.True( actual );
-        Assert.Equal( values["a"](), value );
+        Assert.Equal( values[ "a" ](), value );
 
         actual = target.GetValue( configuration.Object, "b", out value );
         Assert.True( actual );
-        Assert.Equal( values["b"](), value );
+        Assert.Equal( values[ "b" ](), value );
 
         actual = target.GetValue( configuration.Object, "missing", out value );
         Assert.False( actual );

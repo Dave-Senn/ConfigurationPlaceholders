@@ -9,11 +9,11 @@ if ( !String.IsNullOrWhiteSpace( ipProperties.DomainName ) )
 var builder = WebApplication.CreateBuilder( args );
 builder
     .AddConfigurationPlaceholders( new InMemoryPlaceholderResolver( new Dictionary<String, String?>
-                                   {
-                                       { "FQDN", fullDomainName }
-                                   } ),
-                                   MissingPlaceholderValueStrategy.UseEmptyValue );
+    {
+        { "FQDN", fullDomainName }
+    } ),
+    MissingPlaceholderValueStrategy.UseEmptyValue );
 
 var app = builder.Build();
-app.MapGet( "/GetCertInfo", ( IConfiguration configuration ) => $"Use certificate with subject {configuration["CertificateSubject"]} for HTTPS connection." );
+app.MapGet( "/GetCertInfo", ( IConfiguration configuration ) => $"Use certificate with subject {configuration[ "CertificateSubject" ]} for HTTPS connection." );
 app.Run();

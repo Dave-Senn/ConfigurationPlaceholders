@@ -15,21 +15,20 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new InMemoryPlaceholderResolver( new Dictionary<String, String?>() );
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.IgnorePlaceholder );
+        [
+            placeholderResolverMock0
+        ],
+        MissingPlaceholderValueStrategy.IgnorePlaceholder );
 
         var actual = target.TryGet( "A", out var value );
         Assert.True( actual );
-        Assert.Equal( expectedConfiguration["A"], value );
+        Assert.Equal( expectedConfiguration[ "A" ], value );
     }
 
     [Fact]
@@ -41,17 +40,16 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new InMemoryPlaceholderResolver( new Dictionary<String, String?>() );
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.Throw );
+        [
+            placeholderResolverMock0
+        ],
+        MissingPlaceholderValueStrategy.Throw );
 
         Assert.Throws<ConfigurationPlaceholderMissingException>( () => _ = target.TryGet( "A", out _ ) );
     }
@@ -66,17 +64,16 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new InMemoryPlaceholderResolver( new Dictionary<String, String?>() );
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.UseEmptyValue );
+        [
+            placeholderResolverMock0
+        ],
+        MissingPlaceholderValueStrategy.UseEmptyValue );
 
         var actual = target.TryGet( "A", out var value );
         Assert.True( actual );
@@ -99,20 +96,20 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new Mock<IPlaceholderResolver>();
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0.Object
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.VerifyAllAtStartup );
+        [
+            placeholderResolverMock0.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup );
 
-        var actual = target.GetChildKeys( Array.Empty<String>(), "A" )
-                           .ToList();
+        var actual = target.GetChildKeys( [ ], "A" )
+            .ToList();
+
         Assert.Equal( 2, actual.Count );
         Assert.Contains( "B", actual );
         Assert.Contains( "D", actual );
@@ -130,20 +127,20 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new Mock<IPlaceholderResolver>();
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0.Object
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.VerifyAllAtStartup );
+        [
+            placeholderResolverMock0.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup );
 
-        var actual = target.GetChildKeys( new[] { "A" }, "A" )
-                           .ToList();
+        var actual = target.GetChildKeys( [ "A" ], "A" )
+            .ToList();
+
         Assert.Equal( 3, actual.Count );
         Assert.Contains( "A", actual );
         Assert.Contains( "B", actual );
@@ -164,12 +161,11 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         var placeholderResolverMock1 = new Mock<IPlaceholderResolver>();
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRootMock.Object,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0.Object,
-                                                                       placeholderResolverMock1.Object
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.VerifyAllAtStartup );
+        [
+            placeholderResolverMock0.Object,
+            placeholderResolverMock1.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup );
 
         var actual = target.GetReloadToken();
         Assert.Same( changeTokenMock.Object, actual );
@@ -184,12 +180,11 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         var placeholderResolverMock1 = new Mock<IPlaceholderResolver>();
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRootMock.Object,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0.Object,
-                                                                       placeholderResolverMock1.Object
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.VerifyAllAtStartup );
+        [
+            placeholderResolverMock0.Object,
+            placeholderResolverMock1.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup );
 
         target.Load();
 
@@ -206,17 +201,16 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new Mock<IPlaceholderResolver>();
 
         Assert.Throws<ConfigurationPlaceholderMissingException>( () => _ = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                                                                         new List<IPlaceholderResolver>
-                                                                                                                         {
-                                                                                                                             placeholderResolverMock0.Object
-                                                                                                                         },
-                                                                                                                         MissingPlaceholderValueStrategy.VerifyAllAtStartup ) );
+        [
+            placeholderResolverMock0.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup ) );
     }
 
     [Fact]
@@ -224,19 +218,18 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
     {
         var configurationRootMock = new Mock<IConfigurationRoot>();
         configurationRootMock
-            .SetupSet( x => x["a"] = "newValue" )
+            .SetupSet( x => x[ "a" ] = "newValue" )
             .Verifiable();
 
         var placeholderResolverMock0 = new Mock<IPlaceholderResolver>();
         var placeholderResolverMock1 = new Mock<IPlaceholderResolver>();
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRootMock.Object,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0.Object,
-                                                                       placeholderResolverMock1.Object
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.VerifyAllAtStartup );
+        [
+            placeholderResolverMock0.Object,
+            placeholderResolverMock1.Object
+        ],
+        MissingPlaceholderValueStrategy.VerifyAllAtStartup );
 
         target.Set( "a", "newValue" );
 
@@ -257,8 +250,8 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         };
 
         var configurationRoot = new ConfigurationBuilder()
-                                .AddInMemoryCollection( expectedConfiguration )
-                                .Build();
+            .AddInMemoryCollection( expectedConfiguration )
+            .Build();
 
         var placeholderResolverMock0 = new InMemoryPlaceholderResolver( new Dictionary<String, String?>
         {
@@ -266,6 +259,7 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
             { "Key2", "Value2" },
             { "Key4", "Value4" }
         } );
+
         var placeholderResolverMock1 = new InMemoryPlaceholderResolver( new Dictionary<String, String?>
         {
             { "Key1", "Value1.1" },
@@ -274,20 +268,19 @@ public sealed class ResolvePlaceholdersConfigurationProviderTest
         } );
 
         var target = new ResolvePlaceholdersConfigurationProvider( configurationRoot,
-                                                                   new List<IPlaceholderResolver>
-                                                                   {
-                                                                       placeholderResolverMock0,
-                                                                       placeholderResolverMock1
-                                                                   },
-                                                                   MissingPlaceholderValueStrategy.IgnorePlaceholder );
+        [
+            placeholderResolverMock0,
+            placeholderResolverMock1
+        ],
+        MissingPlaceholderValueStrategy.IgnorePlaceholder );
 
         var actual = target.TryGet( "A", out var value );
         Assert.True( actual );
-        Assert.Equal( expectedConfiguration["A"], value );
+        Assert.Equal( expectedConfiguration[ "A" ], value );
 
         actual = target.TryGet( "A:B", out value );
         Assert.True( actual );
-        Assert.Equal( expectedConfiguration["A:B"], value );
+        Assert.Equal( expectedConfiguration[ "A:B" ], value );
 
         actual = target.TryGet( "Missing", out value );
         Assert.False( actual );

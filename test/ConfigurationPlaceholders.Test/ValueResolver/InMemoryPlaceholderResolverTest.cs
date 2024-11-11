@@ -13,22 +13,23 @@ public sealed class InMemoryPlaceholderResolverTest
         {
             {
                 "a", Guid.NewGuid()
-                         .ToString()
+                    .ToString()
             },
             {
                 "b", Guid.NewGuid()
-                         .ToString()
+                    .ToString()
             }
         };
+
         var target = new InMemoryPlaceholderResolver( values );
 
         var actual = target.GetValue( configuration.Object, "a", out var value );
         Assert.True( actual );
-        Assert.Equal( values["a"], value );
+        Assert.Equal( values[ "a" ], value );
 
         actual = target.GetValue( configuration.Object, "b", out value );
         Assert.True( actual );
-        Assert.Equal( values["b"], value );
+        Assert.Equal( values[ "b" ], value );
 
         actual = target.GetValue( configuration.Object, "missing", out value );
         Assert.False( actual );
