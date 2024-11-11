@@ -34,7 +34,7 @@ var configuration = new ConfigurationBuilder()
         } ),
         new ConfigurationPlaceholderResolver(),
         new EnvironmentVariableResolver()
-    ] )
+    ], MissingPlaceholderValueStrategy.Throw )
     .Build();
 
 Environment.SetEnvironmentVariable( "Lookup:DataDir", "C:/Temp/", EnvironmentVariableTarget.Process );
@@ -46,7 +46,8 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Logger.Information( "{0}", configuration[ "Test" ] );
+    var value = configuration[ "Test" ];
+    Log.Logger.Information( "{Value}", value );
     await Task.Delay( 10 );
     Log.Logger.Warning( "{0}", configuration[ "Test" ] );
     Log.Logger.Information( "DB stored here: {0}", configuration[ "LocalDb" ] );
