@@ -32,12 +32,13 @@ internal sealed class ResolvePlaceholdersConfigurationSource : IConfigurationSou
         List<IConfigurationProvider> providers;
         if ( _configuration is null )
         {
-            providers = [];
+            providers = [ ];
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach ( var source in _sources! )
             {
                 if ( source is ResolvePlaceholdersConfigurationSource )
                     continue;
+
                 var provider = source.Build( builder );
                 providers.Add( provider );
             }
@@ -46,7 +47,7 @@ internal sealed class ResolvePlaceholdersConfigurationSource : IConfigurationSou
             providers = _configuration.Providers.ToList();
 
         return new ResolvePlaceholdersConfigurationProvider( new ConfigurationRoot( providers ),
-                                                             _placeholderResolvers,
-                                                             _missingPlaceholderValueStrategy );
+        _placeholderResolvers,
+        _missingPlaceholderValueStrategy );
     }
 }

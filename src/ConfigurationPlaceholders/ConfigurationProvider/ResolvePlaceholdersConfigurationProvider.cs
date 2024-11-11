@@ -29,8 +29,8 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
         var children = section.GetChildren();
 
         return children.Select( childSection => childSection.Key )
-                       .Concat( earlierKeys )
-                       .OrderBy( key => key, ConfigurationKeyComparer.Instance );
+            .Concat( earlierKeys )
+            .OrderBy( key => key, ConfigurationKeyComparer.Instance );
     }
 
     public IChangeToken GetReloadToken() =>
@@ -40,11 +40,11 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
         _configuration.Reload();
 
     public void Set( String key, String? value ) =>
-        _configuration[key] = value;
+        _configuration[ key ] = value;
 
     public Boolean TryGet( String key, out String? value )
     {
-        value = _configuration[key];
+        value = _configuration[ key ];
         if ( value is null )
             return false;
 
@@ -74,7 +74,7 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
             String? placeholderValue = null;
             for ( var i = _placeholderResolvers.Count - 1; i >= 0; i-- )
             {
-                var resolver = _placeholderResolvers[i];
+                var resolver = _placeholderResolvers[ i ];
                 if ( !resolver.GetValue( _configuration, placeholderKey, out placeholderValue ) )
                     continue;
 
@@ -93,7 +93,7 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
             else
                 placeholderValue = ReplacePlaceholderInValue( placeholderValue );
 
-            value = $"{value[..placeholderStartIndex]}{placeholderValue}{value[( placeholderEndIndex + 1 )..]}";
+            value = $"{value[ ..placeholderStartIndex ]}{placeholderValue}{value[ (placeholderEndIndex + 1).. ]}";
 
             placeholderStartIndex++;
         }

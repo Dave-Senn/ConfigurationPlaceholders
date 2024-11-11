@@ -9,10 +9,11 @@ public sealed class ConfigurationPlaceholderResolverTest
     {
         var configuration = new Mock<IConfiguration>();
         configuration
-            .SetupGet( x => x["Key1"] )
+            .SetupGet( x => x[ "Key1" ] )
             .Returns( () => "ValueA" );
+
         configuration
-            .SetupGet( x => x["Key2"] )
+            .SetupGet( x => x[ "Key2" ] )
             .Returns( () => "ValueB" );
 
         var target = new ConfigurationPlaceholderResolver();

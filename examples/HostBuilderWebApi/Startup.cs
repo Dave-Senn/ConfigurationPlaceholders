@@ -1,7 +1,11 @@
 #pragma warning disable CA1050 // Declare types in namespaces
+/// <summary>
+/// </summary>
 public sealed class Startup
 #pragma warning restore CA1050 // Declare types in namespaces
 {
+    /// <summary>
+    /// </summary>
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure( IApplicationBuilder app )
     {
@@ -12,8 +16,8 @@ public sealed class Startup
         app.UseEndpoints( endpoints => { endpoints.MapControllerRoute( "default", "{controller=Home}/{action=Index}" ); } );
     }
 
-    public void ConfigureServices( IServiceCollection services )
-    {
+    /// <summary>
+    /// </summary>
+    public void ConfigureServices( IServiceCollection services ) =>
         services.AddMvc();
-    }
 }

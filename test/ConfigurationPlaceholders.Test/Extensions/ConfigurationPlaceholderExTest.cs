@@ -30,7 +30,7 @@ public sealed class ConfigurationPlaceholderExTest
         Assert.Same( builder, actual );
 
         var configuration = builder.Build();
-        var value = configuration["Name"];
+        var value = configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 
@@ -54,7 +54,7 @@ public sealed class ConfigurationPlaceholderExTest
         Assert.Same( builder, actual );
 
         var configuration = builder.Build();
-        var value = configuration["Name"];
+        var value = configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 
@@ -70,13 +70,13 @@ public sealed class ConfigurationPlaceholderExTest
         };
 
         var builder = Host.CreateDefaultBuilder()
-                          .ConfigureAppConfiguration( ( _, config ) =>
-                          {
-                              config.AddInMemoryCollection( new Dictionary<String, String?>
-                              {
-                                  { "Name", "Value-${Key1}" }
-                              } );
-                          } );
+            .ConfigureAppConfiguration( ( _, config ) =>
+            {
+                config.AddInMemoryCollection( new Dictionary<String, String?>
+                {
+                    { "Name", "Value-${Key1}" }
+                } );
+            } );
 
         var actual = builder.AddConfigurationPlaceholders( placeholderResolvers );
         Assert.Same( builder, actual );
@@ -84,7 +84,7 @@ public sealed class ConfigurationPlaceholderExTest
         var host = builder.Build();
         var configuration = host.Services.GetRequiredService<IConfiguration>();
 
-        var value = configuration["Name"];
+        var value = configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 
@@ -97,13 +97,13 @@ public sealed class ConfigurationPlaceholderExTest
         } );
 
         var builder = Host.CreateDefaultBuilder()
-                          .ConfigureAppConfiguration( ( _, config ) =>
-                          {
-                              config.AddInMemoryCollection( new Dictionary<String, String?>
-                              {
-                                  { "Name", "Value-${Key1}" }
-                              } );
-                          } );
+            .ConfigureAppConfiguration( ( _, config ) =>
+            {
+                config.AddInMemoryCollection( new Dictionary<String, String?>
+                {
+                    { "Name", "Value-${Key1}" }
+                } );
+            } );
 
         var actual = builder.AddConfigurationPlaceholders( placeholderResolver );
         Assert.Same( builder, actual );
@@ -111,7 +111,7 @@ public sealed class ConfigurationPlaceholderExTest
         var host = builder.Build();
         var configuration = host.Services.GetRequiredService<IConfiguration>();
 
-        var value = configuration["Name"];
+        var value = configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 
@@ -131,11 +131,12 @@ public sealed class ConfigurationPlaceholderExTest
         {
             { "Name", "Value-${Key1}" }
         } );
+
         var actual = builder.AddConfigurationPlaceholders( placeholderResolvers );
 
         Assert.Same( builder, actual );
 
-        var value = builder.Configuration["Name"];
+        var value = builder.Configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 
@@ -152,11 +153,12 @@ public sealed class ConfigurationPlaceholderExTest
         {
             { "Name", "Value-${Key1}" }
         } );
+
         var actual = builder.AddConfigurationPlaceholders( placeholderResolver );
 
         Assert.Same( builder, actual );
 
-        var value = builder.Configuration["Name"];
+        var value = builder.Configuration[ "Name" ];
         Assert.Equal( "Value-MyValue", value );
     }
 }

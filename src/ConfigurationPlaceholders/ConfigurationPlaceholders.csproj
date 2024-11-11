@@ -1,67 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <NoWarn>CS0649;CS0169;NU5123</NoWarn>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\ConfigurationPlaceholders.xml</DocumentationFile>
-    <nullable>enable</nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-    <AssemblyName>ConfigurationPlaceholders</AssemblyName>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Authors>Dave Senn</Authors>
-    <Copyright>Copyright (c) Dave Senn</Copyright>
-    <Description>Adds support for placeholders to the .NET configuration stack.</Description>
-    <PackageTags>Configuration;Placeholder;Options</PackageTags>
-    <Product>ConfigurationPlaceholders</Product>
-    <RepositoryType>git</RepositoryType>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <DebugSymbols>true</DebugSymbols>
-    <PackageId>ConfigurationPlaceholders</PackageId>
-    <PackageProjectUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</PackageProjectUrl>
-    <RespositoryType>git</RespositoryType>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <RepositoryUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</RepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <EmbedAllSources>true</EmbedAllSources>
-    <DebugType>portable</DebugType>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>CS0618</WarningsNotAsErrors>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <NoWarn>CS0649;CS0169;NU5123</NoWarn>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\ConfigurationPlaceholders.xml</DocumentationFile>
+        <nullable>enable</nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+        <LangVersion>latest</LangVersion>
+        <AssemblyName>ConfigurationPlaceholders</AssemblyName>
+        <AnalysisLevel>preview-recommended</AnalysisLevel>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <Authors>Dave Senn</Authors>
+        <Copyright>Copyright (c) Dave Senn</Copyright>
+        <Description>Adds support for placeholders to the .NET configuration stack.</Description>
+        <PackageTags>Configuration;Placeholder;Options</PackageTags>
+        <Product>ConfigurationPlaceholders</Product>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <DebugSymbols>true</DebugSymbols>
+        <PackageId>ConfigurationPlaceholders</PackageId>
+        <PackageProjectUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</PackageProjectUrl>
+        <RespositoryType>git</RespositoryType>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <RepositoryUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</RepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <EmbedAllSources>true</EmbedAllSources>
+        <DebugType>portable</DebugType>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsNotAsErrors>CS0618</WarningsNotAsErrors>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="icon.png" Pack="true" PackagePath="" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="" />
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="icon.png" Pack="true" PackagePath="" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="" />
+        <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>ConfigurationPlaceholders.Test</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>ConfigurationPlaceholders.Test</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.13.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Azure.Identity" Version="1.13.1" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+    </ItemGroup>
 
 </Project>

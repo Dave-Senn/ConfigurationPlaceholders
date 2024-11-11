@@ -52,7 +52,7 @@ public sealed class Build : NukeBuild
             String? lsVersion = null;
             versionFile.UpdateJson( versionJson =>
             {
-                lsVersion = versionJson["version"]
+                lsVersion = versionJson[ "version" ]
                     ?.ToString();
             } );
 
@@ -94,7 +94,7 @@ public sealed class Build : NukeBuild
         {
             Log.Information( $"Running build: {Configuration}" );
             DotNetBuild( x => x.SetProjectFile( Solution.Path )
-                             .SetConfiguration( Configuration ) );
+                .SetConfiguration( Configuration ) );
         } );
 
     Target Test => _ => _
@@ -103,9 +103,9 @@ public sealed class Build : NukeBuild
         .Executes( () =>
         {
             DotNetTest( x => x.SetProjectFile( Solution )
-                            .SetConfiguration( Configuration )
-                            .EnableNoRestore()
-                            .EnableNoBuild() );
+                .SetConfiguration( Configuration )
+                .EnableNoRestore()
+                .EnableNoBuild() );
         } );
 
     Target TestWithCoverage => _ => _
@@ -123,26 +123,29 @@ public sealed class Build : NukeBuild
                 "-:ConfigurationPlaceholders.Test",
                 "-:NukeBuild"
             };
+
             var attributeFilters = new HashSet<String>
             {
                 "System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute",
                 "System.CodeDom.Compiler.GeneratedCodeAttribute"
             };
+
             var coverageFiltersString = String.Join( ';', coverageFilters );
             var attributeFiltersString = String.Join( ';', attributeFilters );
 
             var dotCoverOutputFileName = ResultDirectory / $"{Solution.Name}.dotCover.dcvr";
             var dotCoverOutputFileNameString = dotCoverOutputFileName.ToString()
                 .Replace( "\\", "/" );
+
             var solutionName = Solution.Path!.ToString()
                 .Replace( "\\", "/" );
 
             var sbCmdArgs = new StringBuilder();
             sbCmdArgs.Append( "cover-dotnet " );
-            sbCmdArgs.Append( (String?) $"--output=\"{dotCoverOutputFileNameString}\" " );
-            sbCmdArgs.Append( (String?) $"--AttributeFilters=\"{attributeFiltersString}\" " );
-            sbCmdArgs.Append( (String?) $"--Filters=\"{coverageFiltersString}\" " );
-            sbCmdArgs.Append( (String?) $"-- test \"{solutionName}\" --no-build --no-restore --configuration {Configuration} --blame-hang-timeout 1m" );
+            sbCmdArgs.Append( (String?)$"--output=\"{dotCoverOutputFileNameString}\" " );
+            sbCmdArgs.Append( (String?)$"--AttributeFilters=\"{attributeFiltersString}\" " );
+            sbCmdArgs.Append( (String?)$"--Filters=\"{coverageFiltersString}\" " );
+            sbCmdArgs.Append( (String?)$"-- test \"{solutionName}\" --no-build --no-restore --configuration {Configuration} --blame-hang-timeout 1m" );
             var cmdArgs = sbCmdArgs.ToString();
 
             using var process = StartProcess( dotCover, cmdArgs );
@@ -153,13 +156,14 @@ public sealed class Build : NukeBuild
                 TeamCity.Instance.ImportData( TeamCityImportType.dotNetCoverage, dotCoverOutputFileName, TeamCityImportTool.dotcover );
 
             var xmlReportFileName = ResultDirectory / $"{dotCoverOutputFileName.NameWithoutExtension}.xml";
-            DotCoverReport( _ => new List<DotCoverReportSettings>
-            {
+            DotCoverReport( _ =>
+            [
                 new DotCoverReportSettings()
                     .SetOutputFile( xmlReportFileName )
                     .SetReportType( DotCoverReportType.Xml )
                     .SetSource( dotCoverOutputFileName )
-            }, Environment.ProcessorCount );
+            ],
+            Environment.ProcessorCount );
 
             // Open the XML report
             var doc = new XmlDocument();
@@ -167,7 +171,7 @@ public sealed class Build : NukeBuild
 
             // Get the root element containing the overall coverage
             var rootElement = doc.SelectSingleNode( "/Root" )!;
-            var totalCoverage = Double.Parse( rootElement.Attributes!["CoveragePercent"]!.Value );
+            var totalCoverage = Double.Parse( rootElement.Attributes![ "CoveragePercent" ]!.Value );
             Log.Information( $"Total unit test coverage is: {totalCoverage}%" );
 
             // Search for uncovered types
@@ -178,8 +182,9 @@ public sealed class Build : NukeBuild
                 var uncoveredTypes = new List<String>();
                 foreach ( XmlNode type in typesWithoutCoverage )
                 {
-                    var typeName = type.Attributes!["Name"]!
+                    var typeName = type.Attributes![ "Name" ]!
                         .Value;
+
                     Log.Error( $"\t{typeName} is not covered by any test" );
 
                     uncoveredTypes.Add( typeName );
@@ -210,6 +215,7 @@ public sealed class Build : NukeBuild
             {
                 foreach ( var x in process.Output )
                     Log.Error( x.Text );
+
                 throw new( "Found vulnerable packages." );
             }
         } );
@@ -250,48 +256,50 @@ public sealed class Build : NukeBuild
         {
             Log.Information( "Start packing '{0}'", Solution.src.ConfigurationPlaceholders.Name );
             DotNetPack( x => x.SetProject<DotNetPackSettings>( Solution.src.ConfigurationPlaceholders )
-                            .SetConfiguration( Configuration )
-                            .EnableNoBuild()
-                            .EnableNoRestore()
-                            .SetNoDependencies( true )
-                            .SetIncludeSource( true )
-                            .SetIncludeSymbols( true )
-                            .SetSymbolPackageFormat( DotNetSymbolPackageFormat.snupkg )
-                            .SetOutputDirectory( ResultNuGetDirectory ) );
+                .SetConfiguration( Configuration )
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetNoDependencies( true )
+                .SetIncludeSource( true )
+                .SetIncludeSymbols( true )
+                .SetSymbolPackageFormat( DotNetSymbolPackageFormat.snupkg )
+                .SetOutputDirectory( ResultNuGetDirectory ) );
         } );
 
     Target PublishNuGetPackage => _ => _
         .DependsOn( PrepareNuGetPublish )
-        .OnlyWhenDynamic( () => ( IsServerBuild || BuildServerOverride ) && !GitHubActions.Instance.IsPullRequest )
+        .OnlyWhenDynamic( () => (IsServerBuild || BuildServerOverride) && !GitHubActions.Instance.IsPullRequest )
         .Executes( () =>
         {
             Log.Information( "Publishing packages; Is pull request: {IsPullRequest}", GitHubActions.Instance.IsPullRequest );
 
-            GlobFiles( (String) ResultNuGetDirectory, "*.nupkg" )
+            GlobFiles( (String)ResultNuGetDirectory, "*.nupkg" )
                 .ForEach( x =>
                 {
                     Log.Information( "Start publishing package '{0}'", x );
 
                     // Push to NuGet.org
                     DotNetNuGetPush( c => c
-                                         .SetTargetPath( x )
-                                         .SetApiKey( NuGetApiKey )
-                                         .SetSource( "https://api.nuget.org/v3/index.json" )
-                                         .EnableSkipDuplicate() );
+                        .SetTargetPath( x )
+                        .SetApiKey( NuGetApiKey )
+                        .SetSource( "https://api.nuget.org/v3/index.json" )
+                        .EnableSkipDuplicate() );
+
                     Log.Information( "Successfully published package '{0}' to nuget.org", x );
 
                     // Push to GitHub setup from within the GH action script
                     DotNetNuGetPush( c => c
-                                         .SetTargetPath( x )
-                                         .SetApiKey( GitHubAccessToken )
-                                         .SetSource( "github" )
-                                         .EnableSkipDuplicate() );
+                        .SetTargetPath( x )
+                        .SetApiKey( GitHubAccessToken )
+                        .SetSource( "github" )
+                        .EnableSkipDuplicate() );
+
                     Log.Information( "Successfully published package '{0}' to github", x );
                 } );
         } );
 
     Target CreateAndPushGitTag => _ => _
-        .OnlyWhenDynamic( () => ( IsServerBuild || BuildServerOverride ) && !GitHubActions.Instance.IsPullRequest )
+        .OnlyWhenDynamic( () => (IsServerBuild || BuildServerOverride) && !GitHubActions.Instance.IsPullRequest )
         .DependsOn( PublishNuGetPackage )
         .Executes( () =>
         {

@@ -21,7 +21,8 @@ public static class ConfigurationPlaceholderEx
                                                                       MissingPlaceholderValueStrategy missingPlaceholderValueStrategy = MissingPlaceholderValueStrategy.VerifyAllAtStartup )
     {
         webApplicationBuilder.Configuration.AddConfigurationPlaceholders( placeholderResolvers,
-                                                                          missingPlaceholderValueStrategy );
+        missingPlaceholderValueStrategy );
+
         return webApplicationBuilder;
     }
 
@@ -35,8 +36,8 @@ public static class ConfigurationPlaceholderEx
     public static WebApplicationBuilder AddConfigurationPlaceholders( this WebApplicationBuilder webApplicationBuilder,
                                                                       IPlaceholderResolver placeholderResolver,
                                                                       MissingPlaceholderValueStrategy missingPlaceholderValueStrategy = MissingPlaceholderValueStrategy.VerifyAllAtStartup ) =>
-        webApplicationBuilder.AddConfigurationPlaceholders( new List<IPlaceholderResolver> { placeholderResolver },
-                                                            missingPlaceholderValueStrategy );
+        webApplicationBuilder.AddConfigurationPlaceholders( [ placeholderResolver ],
+        missingPlaceholderValueStrategy );
 
     /// <summary>
     ///     Adds support for placeholders in configuration sources.
@@ -53,7 +54,7 @@ public static class ConfigurationPlaceholderEx
             .ConfigureAppConfiguration( ( _, config ) =>
             {
                 config.AddConfigurationPlaceholders( placeholderResolvers,
-                                                     missingPlaceholderValueStrategy );
+                missingPlaceholderValueStrategy );
             } );
 
         return hostBuilder;
@@ -69,8 +70,8 @@ public static class ConfigurationPlaceholderEx
     public static IHostBuilder AddConfigurationPlaceholders( this IHostBuilder hostBuilder,
                                                              IPlaceholderResolver placeholderResolver,
                                                              MissingPlaceholderValueStrategy missingPlaceholderValueStrategy = MissingPlaceholderValueStrategy.VerifyAllAtStartup ) =>
-        hostBuilder.AddConfigurationPlaceholders( new List<IPlaceholderResolver> { placeholderResolver },
-                                                  missingPlaceholderValueStrategy );
+        hostBuilder.AddConfigurationPlaceholders( [ placeholderResolver ],
+        missingPlaceholderValueStrategy );
 
     /// <summary>
     ///     Adds support for placeholders in configuration sources.
@@ -85,13 +86,14 @@ public static class ConfigurationPlaceholderEx
     {
         if ( configurationBuilder is IConfigurationRoot configuration )
             configurationBuilder.Add( new ResolvePlaceholdersConfigurationSource( configuration,
-                                                                                  placeholderResolvers,
-                                                                                  missingPlaceholderValueStrategy ) );
+            placeholderResolvers,
+            missingPlaceholderValueStrategy ) );
         else
         {
             var resolver = new ResolvePlaceholdersConfigurationSource( new List<IConfigurationSource>( configurationBuilder.Sources ),
-                                                                       placeholderResolvers,
-                                                                       missingPlaceholderValueStrategy );
+            placeholderResolvers,
+            missingPlaceholderValueStrategy );
+
             configurationBuilder.Sources.Clear();
             configurationBuilder.Add( resolver );
         }
@@ -109,6 +111,6 @@ public static class ConfigurationPlaceholderEx
     public static IConfigurationBuilder AddConfigurationPlaceholders( this IConfigurationBuilder configurationBuilder,
                                                                       IPlaceholderResolver placeholderResolver,
                                                                       MissingPlaceholderValueStrategy missingPlaceholderValueStrategy = MissingPlaceholderValueStrategy.VerifyAllAtStartup ) =>
-        configurationBuilder.AddConfigurationPlaceholders( new List<IPlaceholderResolver> { placeholderResolver },
-                                                           missingPlaceholderValueStrategy );
+        configurationBuilder.AddConfigurationPlaceholders( [ placeholderResolver ],
+        missingPlaceholderValueStrategy );
 }
