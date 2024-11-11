@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder( args );
 builder
     .AddConfigurationPlaceholders( new InMemoryPlaceholderResolver( new Dictionary<String, String?>
     {
-        { "FQDN", fullDomainName }
+        { "FQDN", fullDomainName },
+        { "Port", 5003.ToString() }
     } ),
     MissingPlaceholderValueStrategy.UseEmptyValue );
 
