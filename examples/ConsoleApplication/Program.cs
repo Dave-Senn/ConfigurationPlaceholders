@@ -39,12 +39,10 @@ var configuration = new ConfigurationBuilder()
 
 Environment.SetEnvironmentVariable( "Lookup:DataDir", "C:/Temp/", EnvironmentVariableTarget.Process );
 
-/*
 Log.Logger = new LoggerConfiguration()
     .ReadFrom
     .Configuration( configuration )
     .CreateLogger();
-*/
 
 try
 {
