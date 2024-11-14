@@ -24,10 +24,10 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <DebugSymbols>true</DebugSymbols>
         <PackageId>ConfigurationPlaceholders</PackageId>
-        <PackageProjectUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders</PackageProjectUrl>
         <RespositoryType>git</RespositoryType>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-        <RepositoryUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders/pull/1</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Dave-Senn/ConfigurationPlaceholders</RepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <EmbedAllSources>true</EmbedAllSources>
         <DebugType>portable</DebugType>
