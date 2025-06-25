@@ -31,11 +31,7 @@ public sealed class EnvironmentVariableResolver : IPlaceholderResolver
             return true;
 
         value = Environment.GetEnvironmentVariable( key, EnvironmentVariableTarget.Machine );
-        // ReSharper disable once ConvertIfStatementToReturnStatement
-        if ( value is not null )
-            return true;
-
-        return false;
+        return value is not null;
     }
 
     #endregion

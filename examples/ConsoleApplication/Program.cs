@@ -34,7 +34,8 @@ var configuration = new ConfigurationBuilder()
         } ),
         new ConfigurationPlaceholderResolver(),
         new EnvironmentVariableResolver()
-    ], MissingPlaceholderValueStrategy.Throw )
+    ],
+    MissingPlaceholderValueStrategy.Throw )
     .Build();
 
 Environment.SetEnvironmentVariable( "Lookup:DataDir", "C:/Temp/", EnvironmentVariableTarget.Process );

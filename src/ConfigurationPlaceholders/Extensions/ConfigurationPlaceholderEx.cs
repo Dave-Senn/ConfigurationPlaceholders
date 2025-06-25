@@ -48,11 +48,7 @@ public static class ConfigurationPlaceholderEx
                                                              MissingPlaceholderValueStrategy missingPlaceholderValueStrategy = MissingPlaceholderValueStrategy.VerifyAllAtStartup )
     {
         hostBuilder
-            .ConfigureAppConfiguration( ( _, config ) =>
-            {
-                config.AddConfigurationPlaceholders( placeholderResolvers,
-                missingPlaceholderValueStrategy );
-            } );
+            .ConfigureAppConfiguration( ( _, config ) => { config.AddConfigurationPlaceholders( placeholderResolvers, missingPlaceholderValueStrategy ); } );
 
         return hostBuilder;
     }
@@ -84,7 +80,7 @@ public static class ConfigurationPlaceholderEx
             configurationBuilder.Add( new ResolvePlaceholdersConfigurationSource( configuration, placeholderResolvers, missingPlaceholderValueStrategy ) );
         else
         {
-            var resolver = new ResolvePlaceholdersConfigurationSource( new List<IConfigurationSource>( configurationBuilder.Sources ),
+            var resolver = new ResolvePlaceholdersConfigurationSource( [ .. configurationBuilder.Sources ],
             placeholderResolvers,
             missingPlaceholderValueStrategy );
 

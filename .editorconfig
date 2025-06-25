@@ -22,6 +22,9 @@ dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
 dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
 
+csharp_preferred_modifier_order = public, protected, private, internal, file, static, required, new,abstract, virtual, sealed, override, readonly, extern, unsafe, volatile, async:warning
+
+
 # Symbol specifications
 
 dotnet_naming_symbols.interface.applicable_kinds = interface
@@ -102,6 +105,9 @@ dotnet_diagnostic.ca2219.severity = error
 dotnet_diagnostic.ca2201.severity = none
 dotnet_diagnostic.ca1700.severity = error
 dotnet_diagnostic.ca1711.severity = none
+# CA2263: Prefer generic overload when type is known
+dotnet_diagnostic.CA2263.severity = error
+dotnet_diagnostic.IDE0150.severity = none
 
 
 
@@ -221,6 +227,7 @@ resharper_csharp_align_multiline_argument = false # https://www.jetbrains.com/he
 # Space after block like if/foreach...
 resharper_blank_lines_after_multiline_statements = 1 # https://www.jetbrains.com/help/resharper/EditorConfig_CSHARP_BlankLinesPageScheme.html#resharper_csharp_blank_lines_after_multiline_statements
 csharp_space_between_empty_square_brackets = true
+resharper_space_between_attribute_sections = false
 
 
 # Indets are shit-....
