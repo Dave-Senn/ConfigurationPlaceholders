@@ -54,13 +54,13 @@ You can specify any number of placeholder resolvers `IPlaceholderResolver` in th
 Later added placeholder resolvers `IPlaceholderResolver` will override values from before added placeholder resolvers `IPlaceholderResolver`.
 
 ### Placeholder verification
-By default **ConfigurationPlaceholders** will check if values are provided for all placeholders. If there are any missing placeholder values a `ConfigurationPlaceholderMissingException` will be thrown.  
+By default, **ConfigurationPlaceholders** will check if values are provided for all placeholders. If there are any missing placeholder values, a `ConfigurationPlaceholderMissingException` will be thrown.  
 You can change this behavior by passing another `MissingPlaceholderValueStrategy` to `AddConfigurationPlaceholders`.
 
 The following strategies are available:
 
 #### VerifyAllAtStartup (**default**)
-Will check if values are provided for all placeholders. If there are any missing placeholder values a `ConfigurationPlaceholderMissingException` will be thrown.
+Will check if values are provided for all placeholders. If there are any missing placeholder values, a `ConfigurationPlaceholderMissingException` will be thrown.
 
 #### Throw
 You can think of this one as a lazy execution version of `VerifyAllAtStartup`.  
@@ -75,14 +75,14 @@ Placeholders for which no value is provided will not be replaced. The resulting 
 `"Hello, ${MissingValue}"` will result in `"Hello, ${MissingValue}"`
 
 
-### Examples
-You can find some examples using **ConfigurationPlaceholders** [here](https://github.com/Dave-Senn/ConfigurationPlaceholders/tree/doc/examples)
+## Examples
+You can find some examples using **ConfigurationPlaceholders** [here](https://github.com/Dave-Senn/ConfigurationPlaceholders/tree/master/examples)
 
 
 ## Available placeholder resolvers `IPlaceholderResolver`
 
 #### InMemoryPlaceholderResolver
-Resolves placeholder values from an in-memory lookup. Works similar like the `AddInMemoryCollection` configuration source.
+Resolves placeholder values from an in-memory lookup. Works similar to the `AddInMemoryCollection` configuration source.
 
 ```c#
 new InMemoryPlaceholderResolver( new Dictionary<String, String?>
@@ -109,7 +109,7 @@ Searches for values in all configuration sources matching the placeholder key.
 new ConfigurationPlaceholderResolver()
 ```
 
-In this example `LocalDb` is build based on other values in `appsettings.json`:
+In this example `LocalDb` is built based on other values in `appsettings.json`:
 ```json
 {
   "Lookup": {
@@ -208,6 +208,12 @@ You can reference values containing placeholders from placeholders...
 ```
 
 In this example we can see several placeholders referencing values containing other placeholders.  
-E.g. `${Lookup:DbDir}` will be resolved with the value `${Lookup:DataDir}db/` from `Lookup:DbDir` (using `ConfigurationPlaceholderResolver`). `${Lookup:DataDir}` is another placeholder which will be replaced with the value of `Lookup:DataDir` => `X:/Temp/`.
+E.g. `${Lookup:DbDir}` will be resolved with the value `${Lookup:DataDir}db/` from `Lookup:DbDir` (using `ConfigurationPlaceholderResolver`). `${Lookup:DataDir}` is another placeholder that will be replaced with the value of `Lookup:DataDir` => `X:/Temp/`.
 
 **You can combine values from multiple `IPlaceholderResolver` with multiple configuration sources.** 
+
+
+## Support for IOptions<T>
+
+ConfigurationPlaceholders natively supports `IOptions<T>`, `IOptionsMonitor<T>` and `IOptionsSnapshot<T>`. ConfigurationPlaceholders also plays nice with validation using `ValidateDataAnnotations` and `ValidateOnStart`.  
+The [ModernWebApi](https://github.com/Dave-Senn/ConfigurationPlaceholders/blob/master/examples/ModernWebApi/Program.cs) example shows how to use these features together with ConfigurationPlaceholders.

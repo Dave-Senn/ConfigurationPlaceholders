@@ -1,4 +1,6 @@
 root = false
 
-[*.{cs,vb}]
-dotnet_diagnostic.CS1591.severity = none
+[*.cs]
+
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.ca1707.severity = none

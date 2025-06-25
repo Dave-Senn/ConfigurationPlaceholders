@@ -82,16 +82,15 @@ internal sealed class ResolvePlaceholdersConfigurationProvider : IConfigurationP
                 break;
             }
 
-            if ( !placeholderValueProvided )
-                placeholderValue = _missingPlaceholderValueStrategy switch
+            placeholderValue = !placeholderValueProvided
+                ? _missingPlaceholderValueStrategy switch
                 {
                     MissingPlaceholderValueStrategy.VerifyAllAtStartup or MissingPlaceholderValueStrategy.Throw => throw new ConfigurationPlaceholderMissingException( $"Could not resolve a value for placeholder '{placeholderKey}'." ),
                     MissingPlaceholderValueStrategy.UseEmptyValue => String.Empty,
                     MissingPlaceholderValueStrategy.IgnorePlaceholder => $"${{{placeholderKey}}}",
                     _ => placeholderValue
-                };
-            else
-                placeholderValue = ReplacePlaceholderInValue( placeholderValue );
+                }
+                : ReplacePlaceholderInValue( placeholderValue );
 
             value = $"{value[ ..placeholderStartIndex ]}{placeholderValue}{value[ (placeholderEndIndex + 1).. ]}";
 

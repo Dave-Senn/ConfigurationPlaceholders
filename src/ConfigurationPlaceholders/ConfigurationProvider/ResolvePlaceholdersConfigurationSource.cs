@@ -44,7 +44,7 @@ internal sealed class ResolvePlaceholdersConfigurationSource : IConfigurationSou
             }
         }
         else
-            providers = _configuration.Providers.ToList();
+            providers = [ .. _configuration.Providers ];
 
         return new ResolvePlaceholdersConfigurationProvider( new ConfigurationRoot( providers ),
         _placeholderResolvers,
