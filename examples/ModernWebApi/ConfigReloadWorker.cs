@@ -1,5 +1,8 @@
+using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.Options;
+
+namespace ModernWebApi;
 
 /// <summary>
 ///     Demonstrates how to use placeholders with options and reloading.
@@ -16,16 +19,14 @@ public sealed class ConfigReloadWorker(
     #region Overrides of BackgroundService
 
     /// <summary>
-    ///     This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The
+    ///     This method is called when the <see cref="IHostedService" /> starts. The
     ///     implementation should return a task that represents
     ///     the lifetime of the long-running operation(s) being performed.
     /// </summary>
     /// <param name="stoppingToken">
-    ///     Triggered when
-    ///     <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is
-    ///     called.
+    ///     Triggered when StopAsync is called.
     /// </param>
-    /// <returns>A <see cref="T:System.Threading.Tasks.Task" /> that represents the long-running operations.</returns>
+    /// <returns>A <see cref="Task" /> that represents the long-running operations.</returns>
     /// <remarks>
     ///     See <see href="https://learn.microsoft.com/dotnet/core/extensions/workers">Worker Services in .NET</see> for
     ///     implementation guidelines.
@@ -45,15 +46,19 @@ public sealed class ConfigReloadWorker(
 
     private void LogOptions( IOptionsSnapshot<AppOptions> optionsSnapshot )
     {
-        var plainOptions = options.Value;
-        var optionsFromMonitor = optionsMonitor.CurrentValue;
-        var optionsFromSnapshot = optionsSnapshot.Value;
+        // ReSharper disable once InvertIf
+        if ( logger.IsEnabled( LogLevel.Information ) )
+        {
+            var plainOptions = options.Value;
+            var optionsFromMonitor = optionsMonitor.CurrentValue;
+            var optionsFromSnapshot = optionsSnapshot.Value;
 
-        var sb = new StringBuilder();
-        sb.AppendLine( $"Current InputFile plain   : {plainOptions.InputFile}" );
-        sb.AppendLine( $"Current InputFile Monitor : {optionsFromMonitor.InputFile}" );
-        sb.AppendLine( $"Current InputFile Snapshot: {optionsFromSnapshot.InputFile}" );
-        logger.LogInformation( "{Values}", sb );
+            var sb = new StringBuilder();
+            sb.AppendLine( CultureInfo.InvariantCulture, $"Current InputFile plain   : {plainOptions.InputFile}" );
+            sb.AppendLine( CultureInfo.InvariantCulture, $"Current InputFile Monitor : {optionsFromMonitor.InputFile}" );
+            sb.AppendLine( CultureInfo.InvariantCulture, $"Current InputFile Snapshot: {optionsFromSnapshot.InputFile}" );
+            logger.LogInformation( "{Values}", sb );
+        }
     }
 
     #endregion

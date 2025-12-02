@@ -31,6 +31,7 @@
         "Default",
         "PrepareNuGetPublish",
         "PublishNuGetPackage",
+        "RestoreDotNetTools",
         "ScanForVulnerabilities",
         "SetVersion",
         "Test",
