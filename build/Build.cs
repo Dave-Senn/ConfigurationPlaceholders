@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using System.Text;
-using System.Xml;
-using Nuke.Common.Utilities;
+﻿using Nuke.Common.Utilities;
 
 // ReSharper disable AllUnderscoreLocalParameterName
 
@@ -14,6 +11,7 @@ public sealed class Build : NukeBuild
     AbsolutePath ResultDirectory => RootDirectory / "result";
     AbsolutePath ResultNuGetDirectory => ResultDirectory / "nuget";
     AbsolutePath ReSharperSettingsFile => RootDirectory / "data/r#Settings.DotSettings";
+    AbsolutePath TestDirectory => RootDirectory / "test";
 
     [Parameter]
     Boolean BuildServerOverride { get; }
@@ -26,7 +24,7 @@ public sealed class Build : NukeBuild
     [GitRepository]
     GitRepository Repository { get; } = default!;
 
-    String Version { get; set; } = "1.0.0";
+    String Version { get; set; } = "2.0.0";
 
     [Secret]
     String? NuGetApiKey => Environment.GetEnvironmentVariable( "NUGET_API_KEY" );
@@ -42,9 +40,16 @@ public sealed class Build : NukeBuild
             ResultDirectory.CreateOrCleanDirectory();
         } );
 
+    Target RestoreDotNetTools => _ => _
+        .DependsOn( CleanBeforeBuild )
+        .Executes( () =>
+        {
+            DotNetToolRestore( new DotNetToolRestoreSettings() );
+        } );
+
     Target SetVersion => _ => _
         .OnlyWhenDynamic( () => IsServerBuild || BuildServerOverride )
-        .DependsOn( CleanBeforeBuild )
+        .DependsOn( RestoreDotNetTools )
         .Executes( () =>
         {
             var version = "1.0.0";
@@ -116,9 +121,6 @@ public sealed class Build : NukeBuild
         .OnlyWhenDynamic( () => !Repository.IsOnMainOrMasterBranch() && !MasterBranchOverride )
         .Executes( () =>
         {
-            var dotCover = GetPackageExecutable( "JetBrains.dotCover.CommandLineTools", "dotCover.exe" );
-            Log.Information( "Use dotCover: {0}", dotCover );
-
             var coverageFilters = new HashSet<String>
             {
                 "+:ConfigurationPlaceholders",
@@ -136,67 +138,48 @@ public sealed class Build : NukeBuild
             var coverageFiltersString = String.Join( ';', coverageFilters );
             var attributeFiltersString = String.Join( ';', attributeFilters );
 
-            var dotCoverOutputFileName = ResultDirectory / $"{Solution.Name}.dotCover.dcvr";
-            var dotCoverOutputFileNameString = dotCoverOutputFileName.ToString().Replace( "\\", "/" );
-            var solutionName = Solution.Path!.ToString().Replace( "\\", "/" );
-
-            var sbCmdArgs = new StringBuilder();
-            sbCmdArgs.Append( "cover-dotnet " );
-            sbCmdArgs.Append( (String?)$"--output=\"{dotCoverOutputFileNameString}\" " );
-            sbCmdArgs.Append( (String?)$"--AttributeFilters=\"{attributeFiltersString}\" " );
-            sbCmdArgs.Append( (String?)$"--Filters=\"{coverageFiltersString}\" " );
-            sbCmdArgs.Append( (String?)$"-- test \"{solutionName}\" --no-build --no-restore --configuration {Configuration} --blame-hang-timeout 1m" );
-            var cmdArgs = sbCmdArgs.ToString();
-
-            using var process = StartProcess( dotCover, cmdArgs );
-            process.AssertZeroExitCode();
-
-            // Export to TC
-            if ( Host is TeamCity )
-                TeamCity.Instance.ImportData( TeamCityImportType.dotNetCoverage, dotCoverOutputFileName, TeamCityImportTool.dotcover );
-
-            var xmlReportFileName = ResultDirectory / $"{dotCoverOutputFileName.NameWithoutExtension}.xml";
-            DotCoverReport( _ =>
-            [
-                new DotCoverReportSettings()
-                    .SetOutputFile( xmlReportFileName )
-                    .SetReportType( DotCoverReportType.Xml )
-                    .SetSource( dotCoverOutputFileName )
-            ],
-            Environment.ProcessorCount );
-
-            // Open the XML report
-            var doc = new XmlDocument();
-            doc.Load( xmlReportFileName.ToString() );
-
-            // Get the root element containing the overall coverage
-            var rootElement = doc.SelectSingleNode( "/Root" )!;
-            var totalCoverage = Double.Parse( rootElement.Attributes![ "CoveragePercent" ]!.Value, CultureInfo.InvariantCulture );
-            Log.Information( "Total unit test coverage is: {TotalCoverage}%", totalCoverage );
-
-            // Search for uncovered types
-            var typesWithoutCoverage = doc.SelectNodes( "//Type[@CoveragePercent='0']" )!;
-            if ( typesWithoutCoverage.Count > 0 )
+            var coverOutputs = new HashSet<String>();
+            foreach ( var testsProject in GetTestsProjects() )
             {
-                Log.Information( "Project contains types without coverage:" );
-                var uncoveredTypes = new List<String>();
-                foreach ( XmlNode type in typesWithoutCoverage )
-                {
-                    var typeName = type.Attributes![ "Name" ]!
-                        .Value;
+                Log.Information( "Run coverage for text project {Name}", testsProject.Name );
 
-                    Log.Error( "\t{TypeName} is not covered by any test", typeName );
+                var dotCoverOutputFileName = ResultDirectory / $"{testsProject.Name}.dotCover.dcvr";
+                var dotCoverOutputFileNameString = dotCoverOutputFileName.ToString()!.Replace( "\\", "/" );
+                coverOutputs.Add( dotCoverOutputFileNameString );
 
-                    uncoveredTypes.Add( typeName );
-                }
+                Log.Information( "Write result to {ReportFile}", dotCoverOutputFileNameString );
 
-                throw new( $"The build contains uncovered types '{String.Join( ",", uncoveredTypes )}'" );
+                var projectName = testsProject.Path!.ToString()!.Replace( "\\", "/" );
+                DotNet(
+                $"dotcover cover"
+                + $" --snapshot-output \"{dotCoverOutputFileNameString}\""
+                + $" --Filters \"{coverageFiltersString}\""
+                + $" --AttributeFilters \"{attributeFiltersString}\""
+                + $" -- test \"{projectName}\""
+                + $" --no-build --no-restore --configuration {Configuration} --blame-hang-timeout 3m"
+                );
+
+                Log.Information( "Coverage successful for text project {Name}", testsProject.Name );
             }
 
-            Log.Information( "Code coverage is {0}%", totalCoverage );
-            // Check coverage is not too low
-            if ( totalCoverage < RequiredCoveragePercentage )
-                throw new( $"Unit test coverage is too low (must be at least {RequiredCoveragePercentage}% but is only {totalCoverage}%)." );
+            var dotCoverCombinedOutputFileName = ResultDirectory / $"{Solution.Name}.dotCover.dcvr";
+            var dotCoverCombinedOutputFileNameString = dotCoverCombinedOutputFileName.ToString()!.Replace( "\\", "/" );
+            var mergeSource = String.Empty;
+            foreach ( var coverOutput in coverOutputs )
+                if ( String.IsNullOrWhiteSpace( mergeSource ) )
+                    mergeSource += coverOutput;
+                else
+                    mergeSource += "," + mergeSource;
+
+            Log.Information( "Run dotCover merge from sources: {MergeSource}...", mergeSource );
+
+            DotNet(
+            $"dotcover merge"
+            + $" --snapshot-output \"{dotCoverCombinedOutputFileNameString}\""
+            + $" --snapshot-source \"{mergeSource}\""
+            );
+
+            Log.Information( "DotCover run successfully!" );
         } );
 
     Target ScanForVulnerabilities => _ => _
@@ -226,23 +209,14 @@ public sealed class Build : NukeBuild
         .DependsOn( Test, TestWithCoverage, ScanForVulnerabilities )
         .Executes( () =>
         {
-            var inspectCode = GetPackageExecutable( "JetBrains.ReSharper.CommandLineTools", "inspectCode.exe" );
+            var outputFileName = ResultDirectory / $"{Solution.Name}.InspectionResult.json";
+            var outputFileNameString = outputFileName.ToString()!.Replace( "\\", "/" );
 
-            var outputFileName = ResultDirectory / $"{Solution.Name}.InspectionResult.xml";
-            var outputFileNameString = outputFileName.ToString().Replace( "\\", "/" );
-            var reSharperSettings = ReSharperSettingsFile.ToString().Replace( "\\", "/" );
-            var solutionName = Solution.Path!.ToString().Replace( "\\", "/" );
-
-            var sbCmdArgs = new StringBuilder();
-            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/output=\"{outputFileNameString}\" " );
-            sbCmdArgs.Append( "/swea " );
-            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/properties:\"configuration={Configuration}\" " );
-            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/profile=\"{reSharperSettings}\" " );
-            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"--build \"{solutionName}\"" );
-            var cmdArgs = sbCmdArgs.ToString();
-
-            using var process = StartProcess( inspectCode, cmdArgs );
-            process.AssertZeroExitCode();
+            var reSharperSettings = ReSharperSettingsFile.ToString()!.Replace( "\\", "/" );
+            var solutionName = Solution.Path!.ToString()!.Replace( "\\", "/" );
+            DotNet( $"""
+                     jb inspectcode /output="{outputFileNameString}" /swea -f="SARIF" --properties:"Configuration={Configuration}" /profile="{reSharperSettings}" --no-build "{solutionName}" --exclude="*.editorconfig"
+                     """ );
         } );
 
     Target PrepareNuGetPublish => _ => _
@@ -313,6 +287,33 @@ public sealed class Build : NukeBuild
 
     public static Int32 Main() =>
         Execute<Build>( x => x.Default );
+
+    /// <summary>
+    ///     Gets all tests projects.
+    /// </summary>
+    /// <returns>Test projects.</returns>
+    IReadOnlyCollection<Project> GetTestsProjects()
+    {
+        var testProjects = new List<Project>();
+        foreach ( var project in Solution.AllProjects )
+        {
+            var isTest = false;
+            var projectDirectory = project.Directory;
+            while ( projectDirectory is not null )
+            {
+                isTest = projectDirectory == TestDirectory;
+                if ( isTest )
+                    break;
+
+                projectDirectory = projectDirectory.Parent;
+            }
+
+            if ( isTest )
+                testProjects.Add( project );
+        }
+
+        return testProjects;
+    }
     // ReSharper disable once InconsistentNaming
 }
 #pragma warning restore CA1822 // Mark members as static

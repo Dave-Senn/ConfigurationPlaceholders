@@ -27,9 +27,4 @@
         <None Remove="..\.nuke\temp\**" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageDownload Include="JetBrains.dotCover.CommandLineTools" Version="[2022.3.0]" />
-        <PackageDownload Include="JetBrains.ReSharper.CommandLineTools" Version="[2022.3.0]" />
-    </ItemGroup>
-
 </Project>
