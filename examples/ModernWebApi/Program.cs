@@ -1,17 +1,19 @@
+using System.Globalization;
 using System.Net.NetworkInformation;
 using ConfigurationPlaceholders;
+using ModernWebApi;
 
 var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-var fullDomainName = ipProperties.HostName.ToLower();
+var fullDomainName = ipProperties.HostName.ToLowerInvariant();
 if ( !String.IsNullOrWhiteSpace( ipProperties.DomainName ) )
-    fullDomainName = $"{ipProperties.HostName}.{ipProperties.DomainName}".ToLower();
+    fullDomainName = $"{ipProperties.HostName}.{ipProperties.DomainName}".ToLowerInvariant();
 
 var builder = WebApplication.CreateBuilder( args );
 builder
     .AddConfigurationPlaceholders( new InMemoryPlaceholderResolver( new Dictionary<String, String?>
     {
         { "FQDN", fullDomainName },
-        { "Port", 5003.ToString() },
+        { "Port", 5003.ToString( CultureInfo.InvariantCulture ) },
         { "FileExtension", ".txt" }
     } ),
     MissingPlaceholderValueStrategy.UseEmptyValue );

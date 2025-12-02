@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 using ConfigurationPlaceholders;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -30,7 +31,7 @@ var configuration = new ConfigurationBuilder()
         } ),
         new CallbackPlaceholderResolver( new Dictionary<String, Func<String?>>
         {
-            { "Time", () => DateTime.Now.ToString( "HH:mm:ss.fff" ) }
+            { "Time", () => DateTime.Now.ToString( "HH:mm:ss.fff", CultureInfo.InvariantCulture ) }
         } ),
         new ConfigurationPlaceholderResolver(),
         new EnvironmentVariableResolver()

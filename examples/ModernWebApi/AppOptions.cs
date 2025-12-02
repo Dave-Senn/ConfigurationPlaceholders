@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace ModernWebApi;
+
 /// <summary>
 ///     Just some demo options.
 /// </summary>
@@ -20,7 +22,7 @@ public sealed class AppOptions
     public required String InputFile { get; set; }
 
     /// <summary>
-    /// Use this to test validation.
+    ///     Use this to test validation.
     /// </summary>
     [MinLength( 3 )]
     public required String MinLengthString { get; set; }

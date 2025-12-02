@@ -1,11 +1,14 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Xml;
 using Nuke.Common.Utilities;
 
-#pragma warning disable CA1050 // Declare types in namespaces
+// ReSharper disable AllUnderscoreLocalParameterName
+
+namespace Build;
+
 #pragma warning disable CA1822 // Mark members as static
 public sealed class Build : NukeBuild
-#pragma warning restore CA1050 // Declare types in namespaces
 {
     [Solution( GenerateProjects = true )] readonly Solution Solution = default!;
     AbsolutePath ResultDirectory => RootDirectory / "result";
@@ -92,7 +95,7 @@ public sealed class Build : NukeBuild
         .DependsOn( SetVersion )
         .Executes( () =>
         {
-            Log.Information( $"Running build: {Configuration}" );
+            Log.Information( "Running build: {Configuration}", Configuration );
             DotNetBuild( x => x.SetProjectFile( Solution.Path )
                 .SetConfiguration( Configuration ) );
         } );
@@ -134,11 +137,8 @@ public sealed class Build : NukeBuild
             var attributeFiltersString = String.Join( ';', attributeFilters );
 
             var dotCoverOutputFileName = ResultDirectory / $"{Solution.Name}.dotCover.dcvr";
-            var dotCoverOutputFileNameString = dotCoverOutputFileName.ToString()
-                .Replace( "\\", "/" );
-
-            var solutionName = Solution.Path!.ToString()
-                .Replace( "\\", "/" );
+            var dotCoverOutputFileNameString = dotCoverOutputFileName.ToString().Replace( "\\", "/" );
+            var solutionName = Solution.Path!.ToString().Replace( "\\", "/" );
 
             var sbCmdArgs = new StringBuilder();
             sbCmdArgs.Append( "cover-dotnet " );
@@ -171,8 +171,8 @@ public sealed class Build : NukeBuild
 
             // Get the root element containing the overall coverage
             var rootElement = doc.SelectSingleNode( "/Root" )!;
-            var totalCoverage = Double.Parse( rootElement.Attributes![ "CoveragePercent" ]!.Value );
-            Log.Information( $"Total unit test coverage is: {totalCoverage}%" );
+            var totalCoverage = Double.Parse( rootElement.Attributes![ "CoveragePercent" ]!.Value, CultureInfo.InvariantCulture );
+            Log.Information( "Total unit test coverage is: {TotalCoverage}%", totalCoverage );
 
             // Search for uncovered types
             var typesWithoutCoverage = doc.SelectNodes( "//Type[@CoveragePercent='0']" )!;
@@ -185,7 +185,7 @@ public sealed class Build : NukeBuild
                     var typeName = type.Attributes![ "Name" ]!
                         .Value;
 
-                    Log.Error( $"\t{typeName} is not covered by any test" );
+                    Log.Error( "\t{TypeName} is not covered by any test", typeName );
 
                     uncoveredTypes.Add( typeName );
                 }
@@ -211,10 +211,11 @@ public sealed class Build : NukeBuild
             foreach ( var x in process.Output )
                 hasErrors = x.Text.Contains( "has the following vulnerable packages", StringComparison.OrdinalIgnoreCase ) || hasErrors;
 
+            // ReSharper disable once InvertIf
             if ( hasErrors )
             {
                 foreach ( var x in process.Output )
-                    Log.Error( x.Text );
+                    Log.Error( "{Text}", x.Text );
 
                 throw new( "Found vulnerable packages." );
             }
@@ -228,21 +229,16 @@ public sealed class Build : NukeBuild
             var inspectCode = GetPackageExecutable( "JetBrains.ReSharper.CommandLineTools", "inspectCode.exe" );
 
             var outputFileName = ResultDirectory / $"{Solution.Name}.InspectionResult.xml";
-            var outputFileNameString = outputFileName.ToString()
-                .Replace( "\\", "/" );
-
-            var reSharperSettings = ReSharperSettingsFile.ToString()
-                .Replace( "\\", "/" );
-
-            var solutionName = Solution.Path!.ToString()
-                .Replace( "\\", "/" );
+            var outputFileNameString = outputFileName.ToString().Replace( "\\", "/" );
+            var reSharperSettings = ReSharperSettingsFile.ToString().Replace( "\\", "/" );
+            var solutionName = Solution.Path!.ToString().Replace( "\\", "/" );
 
             var sbCmdArgs = new StringBuilder();
-            sbCmdArgs.Append( $"/output=\"{outputFileNameString}\" " );
+            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/output=\"{outputFileNameString}\" " );
             sbCmdArgs.Append( "/swea " );
-            sbCmdArgs.Append( $"/properties:\"configuration={Configuration}\" " );
-            sbCmdArgs.Append( $"/profile=\"{reSharperSettings}\" " );
-            sbCmdArgs.Append( $"--build \"{solutionName}\"" );
+            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/properties:\"configuration={Configuration}\" " );
+            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"/profile=\"{reSharperSettings}\" " );
+            sbCmdArgs.Append( CultureInfo.InvariantCulture, $"--build \"{solutionName}\"" );
             var cmdArgs = sbCmdArgs.ToString();
 
             using var process = StartProcess( inspectCode, cmdArgs );
