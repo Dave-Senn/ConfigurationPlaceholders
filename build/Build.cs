@@ -24,7 +24,7 @@ public sealed class Build : NukeBuild
     [GitRepository]
     GitRepository Repository { get; } = default!;
 
-    String Version { get; set; } = "2.0.0";
+    String Version { get; set; } = "3.0.0";
 
     [Secret]
     String? NuGetApiKey => Environment.GetEnvironmentVariable( "NUGET_API_KEY" );
@@ -52,7 +52,7 @@ public sealed class Build : NukeBuild
         .DependsOn( RestoreDotNetTools )
         .Executes( () =>
         {
-            var version = "1.0.0";
+            var version = "3.0.0";
 
             // Read version
             var versionFile = RootDirectory / "version.json";
